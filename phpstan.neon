@@ -1,0 +1,70 @@
+includes:
+	- vendor/phpstan/phpstan-symfony/extension.neon
+	- vendor/phpstan/phpstan-symfony/rules.neon
+	- vendor/phpstan/phpstan-strict-rules/rules.neon
+	- vendor/phpstan/phpstan-phpunit/extension.neon
+	- phar://vendor/phpstan/phpstan/phpstan.phar/conf/bleedingEdge.neon
+	- vendor/shipmonk/phpstan-rules/rules.neon
+
+rules:
+    - PHPStan\Rules\DeadCode\UnreachableStatementRule
+parameters:
+    level: 10
+    paths:
+        - src/
+        - tests/
+
+    # levels: https://github.com/phpstan/phpstan-src/tree/master/conf
+    checkFunctionNameCase: true
+    reportUnmatchedIgnoredErrors: false
+    checkBenevolentUnionTypes: true
+    reportAlwaysTrueInLastCondition: true
+    checkMissingCallableSignature: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    reportAnyTypeWideningInVarTag: true
+    reportPossiblyNonexistentConstantArrayOffset: true
+
+    shipmonkRules:
+        enableAllRules: false
+        forbidEnumInFunctionArguments:
+            enabled: true
+        forbidIdenticalClassComparison:
+            enabled: true
+            blacklist!:
+                - DateTimeInterface
+        forbidIncrementDecrementOnNonInteger:
+            enabled: true
+        forbidNullInAssignOperations:
+            enabled: true
+        forbidProtectedEnumMethod:
+            enabled: true
+        forbidUnusedException:
+            enabled: true
+        forbidCheckedExceptionInCallable:
+            enabled: true
+        forbidCheckedExceptionInYieldingMethod:
+            enabled: true
+        forbidReturnValueInYieldingMethod:
+            enabled: true
+        forbidUnusedMatchResult:
+            enabled: true
+        enforceEnumMatch:
+            enabled: true
+        allowComparingOnlyComparableTypes:
+            enabled: true
+        forbidCast:
+            enabled: true
+        forbidMatchDefaultArmForEnums:
+            enabled: true
+        forbidNotNormalizedType:
+            enabled: true
+        enforceListReturn:
+            enabled: true
+    exceptions:
+        reportUncheckedExceptionDeadCatch: false
+        uncheckedExceptionClasses:
+            - 'LogicException'
+            - 'RuntimeException'
+            - 'Error'
+        check:
+            missingCheckedExceptionInThrows: true

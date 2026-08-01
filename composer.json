@@ -1,0 +1,82 @@
+{
+  "name": "helppc/encryption-bundle",
+  "type": "symfony-bundle",
+  "description": "Symfony bundle exposing a typed encryption facade over spaze/encryption (Halite, libsodium)",
+  "keywords": ["encryption", "halite", "libsodium", "sodium", "symfony", "bundle", "key-rotation"],
+  "homepage": "https://github.com/helppc/encryption-bundle",
+  "authors": [
+    {
+      "name": "Tomáš Kulhánek",
+      "email": "jsem@tomaskulhanek.cz"
+    }
+  ],
+  "require": {
+    "php": ">=8.4",
+    "ext-sodium": "*",
+    "spaze/encryption": "dev-main",
+    "symfony/config": "^8.0",
+    "symfony/console": "^8.0",
+    "symfony/dependency-injection": "^8.0",
+    "symfony/framework-bundle": "^8.0",
+    "symfony/http-kernel": "^8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "HelpPC\\EncryptionBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "HelpPC\\EncryptionBundle\\Tests\\": "tests/"
+    }
+  },
+  "license": "MIT",
+  "scripts": {
+    "phpstan": [
+      "php -d xdebug.mode=off vendor/phpstan/phpstan/phpstan analyze -c phpstan.neon --no-progress --memory-limit=-1"
+    ],
+    "phpunit": "phpunit",
+    "phpcs": "phpcs --standard=./phpcs.xml",
+    "phpcbf": "phpcbf --standard=./phpcs.xml",
+    "rector:check": [
+      "php vendor/bin/rector process --dry-run"
+    ],
+    "rector:apply": [
+      "php vendor/bin/rector process"
+    ]
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-phpunit": "^2.0",
+    "phpstan/phpstan-strict-rules": "^2.0",
+    "phpstan/phpstan-symfony": "^2.0",
+    "phpunit/phpunit": "^12.3",
+    "rector/rector": "^2.1",
+    "shipmonk/phpstan-rules": "^4.2",
+    "slevomat/coding-standard": "^8.22",
+    "squizlabs/php_codesniffer": "^3.13"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": {
+      "*": "dist"
+    },
+    "sort-packages": true,
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "archive": {
+    "exclude": [
+      "/.github",
+      "/AGENTS.md",
+      "/phpcs.xml",
+      "/phpstan.neon",
+      "/phpunit.xml",
+      "/rector.php",
+      "/tests"
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
