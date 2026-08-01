@@ -53,7 +53,7 @@
     "phpunit/phpunit": "^12.3",
     "rector/rector": "^2.1",
     "shipmonk/phpstan-rules": "^4.2",
-    "slevomat/coding-standard": "^8.22",
+    "slevomat/coding-standard": "^8.27",
     "squizlabs/php_codesniffer": "^4.0"
   },
   "config": {
