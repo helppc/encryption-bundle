@@ -1,0 +1,35 @@
+encryption:
+    default_group: default
+    groups:
+        default:
+            type: symmetric
+            key_prefix: test
+            active_key: v1
+            keys:
+                v1: '%env(TEST_SYMMETRIC_V1)%'
+
+        vault:
+            type: !php/enum HelpPC\EncryptionBundle\EncryptionType::AnonymousAsymmetric
+            key_prefix: test
+            active_key: v1
+            keys:
+                v1:
+                    public_key: '%env(TEST_ALICE_PUBLIC_V1)%'
+                    secret_key: '%env(TEST_ALICE_SECRET_V1)%'
+
+        partner_inbox:
+            type: !php/enum HelpPC\EncryptionBundle\EncryptionType::AnonymousAsymmetric
+            key_prefix: test
+            active_key: v1
+            keys:
+                v1:
+                    public_key: '%env(TEST_ALICE_PUBLIC_V1)%'
+
+        peer:
+            type: !php/enum HelpPC\EncryptionBundle\EncryptionType::Asymmetric
+            key_prefix: test
+            active_key: v1
+            keys:
+                v1:
+                    public_key: '%env(TEST_BOB_PUBLIC_V1)%'
+                    secret_key: '%env(TEST_ALICE_SECRET_V1)%'
