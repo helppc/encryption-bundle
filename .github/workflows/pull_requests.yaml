@@ -1,0 +1,19 @@
+name: 👤 Assign PR Author
+
+on:
+  workflow_dispatch: {}
+  workflow_call: {}
+  pull_request:
+    types: [ opened ]
+
+concurrency:
+  group: "${{ github.workflow }}-${{github.head_ref || github.ref_name}}-assign-pr-author"
+  cancel-in-progress: false
+
+jobs:
+  assignAuthor:
+    name: Assign Author
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Assign Author
+        uses: technote-space/assign-author@v1
