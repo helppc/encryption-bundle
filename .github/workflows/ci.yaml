@@ -1,0 +1,48 @@
+name: "🛡️ Code Quality Assurance"
+run-name: "${{ github.actor }} running 🛡️ Code Quality Assurance"
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ci.yaml'
+      - '.github/workflows/reusable-checks.yaml'
+      - '**/*.php'
+      - 'src'
+      - 'tests'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpcs.xml'
+      - 'phpstan.neon'
+      - 'phpunit.xml'
+      - 'rector.php'
+    branches:
+      - main
+
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - '.github/workflows/ci.yaml'
+      - '.github/workflows/reusable-checks.yaml'
+      - '**/*.php'
+      - 'src'
+      - 'tests'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpcs.xml'
+      - 'phpstan.neon'
+      - 'phpunit.xml'
+      - 'rector.php'
+
+  workflow_dispatch: ~
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: "🔎 QA Checks"
+    uses: ./.github/workflows/reusable-checks.yaml
+    secrets: inherit
+    with:
+      php_version: 8.4

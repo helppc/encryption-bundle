@@ -1,0 +1,22 @@
+name: "🦉 Nightly Quality Suite"
+run-name: "${{ github.actor }} running nightly QA"
+
+on:
+  schedule:
+    - cron: '0 3 1 * *'
+  workflow_dispatch: ~
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: "🦉 Reusable Nightly QA"
+    uses: ./.github/workflows/reusable-checks.yaml
+    secrets: inherit
+    with:
+      php_version: ${{ matrix.php-versions }}
+    strategy:
+      matrix:
+        php-versions: ['8.4']

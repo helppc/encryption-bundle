@@ -1,0 +1,94 @@
+name: "🛡️ Reusable Quality Checks"
+
+on:
+  workflow_call:
+    inputs:
+      php_version:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  composer-install-args: "--no-progress --no-interaction --prefer-dist --no-scripts"
+  php-extensions: "sodium"
+
+jobs:
+  composer:
+    name: "🏗 PHP & Composer Setup"
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+        name: 👞 Checkout
+
+      - name: 🔍 Check if composer.json exists
+        id: check_files
+        uses: andstor/file-existence-action@v3
+        with:
+          files: composer.json
+
+      - uses: php-actions/composer@v6
+        name: 📀 Install Dependencies
+        with:
+          args: ${{ env.composer-install-args }}
+          php_version: ${{ inputs.php_version }}
+          php_extensions: ${{ env.php-extensions }}
+
+      - name: 🧪 Composer Validate
+        run: composer validate --strict
+
+      - name: 🛡️ Composer Audit
+        run: composer audit
+
+  check:
+    needs: composer
+    name: "🛡️ Static Analysis"
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+        name: 👞 Checkout
+
+      - name: 🔍 Check if composer.json exists
+        id: check_files
+        uses: andstor/file-existence-action@v3
+        with:
+          files: composer.json
+
+      - name: 📅 Setup PHP ${{ inputs.php_version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php_version }}
+          tools: composer
+
+      - uses: php-actions/composer@v6
+        name: 📀 Install Dependencies
+        with:
+          args: ${{ env.composer-install-args }}
+          php_version: ${{ inputs.php_version }}
+          php_extensions: ${{ env.php-extensions }}
+
+      - name: 🔍 PHPStan Analysis
+        id: phpstan
+        run: composer phpstan
+
+      - name: 🛃 Code Style (PHPCS)
+        id: phpcs
+        if: success() || steps.phpstan.outcome == 'failure'
+        run: composer phpcs
+
+      - name: ♻️ Rector (dry run)
+        id: rector
+        if: success() || steps.phpstan.outcome == 'failure' || steps.phpcs.outcome == 'failure'
+        run: composer rector:check
+
+      - name: 🧪 Unit Tests
+        if: success() || steps.phpstan.outcome == 'failure' || steps.phpcs.outcome == 'failure' || steps.rector.outcome == 'failure'
+        run: composer phpunit
+
