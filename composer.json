@@ -54,7 +54,7 @@
     "rector/rector": "^2.1",
     "shipmonk/phpstan-rules": "^4.2",
     "slevomat/coding-standard": "^8.22",
-    "squizlabs/php_codesniffer": "^3.13"
+    "squizlabs/php_codesniffer": "^4.0"
   },
   "config": {
     "optimize-autoloader": true,
