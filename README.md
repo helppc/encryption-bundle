@@ -16,7 +16,7 @@ when the container is compiled rather than at runtime.
 
 ## Installation
 
-The repository is private, so point Composer at it:
+Not on Packagist yet, so point Composer at the repository:
 
 ```bash
 composer config repositories.helppc-encryption-bundle vcs https://github.com/helppc/encryption-bundle
