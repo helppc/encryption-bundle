@@ -16,17 +16,16 @@ when the container is compiled rather than at runtime.
 
 ## Installation
 
-Not on Packagist yet, so point Composer at the repository:
-
 ```bash
-composer config repositories.helppc-encryption-bundle vcs https://github.com/helppc/encryption-bundle
-composer require helppc/encryption-bundle:dev-main
+composer config minimum-stability dev
+composer config prefer-stable true
+composer require helppc/encryption-bundle
 ```
 
-> `spaze/encryption` is required as `dev-main`. Asymmetric encryption is merged upstream but not
-> tagged yet — the latest tag, `v2.3.2`, only ships `SymmetricKeyEncryption`. Your application
-> therefore needs `minimum-stability: dev` with `prefer-stable: true`. This goes away once a tag
-> containing the asymmetric classes is released.
+> The two `config` lines are needed, and `composer require` alone fails without them.
+> `spaze/encryption` is required as `dev-main`: its asymmetric classes are merged upstream but not
+> tagged yet, the latest tag `v2.3.2` ships only `SymmetricKeyEncryption`. `prefer-stable` keeps
+> every other dependency on its stable release. Both lines go away once a suitable tag exists.
 
 Register the bundle in `config/bundles.php`:
 
