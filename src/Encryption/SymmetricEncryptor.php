@@ -6,13 +6,16 @@ namespace HelpPC\EncryptionBundle\Encryption;
 
 use HelpPC\EncryptionBundle\Exception\DecryptionException;
 use HelpPC\EncryptionBundle\Exception\EncryptionException;
+use JsonException;
 use ParagonIE\Halite\Alerts\HaliteAlert;
 use SensitiveParameter;
 use SodiumException;
 use Spaze\Encryption\Exceptions\DecryptWithAdNeedsAdditionalDataException;
 use Spaze\Encryption\Exceptions\EncryptWithAdNeedsAdditionalDataException;
+use Spaze\Encryption\Exceptions\FormatMarkerMismatchException;
 use Spaze\Encryption\Exceptions\InvalidCipherTextFormatException;
 use Spaze\Encryption\Exceptions\UnknownEncryptionKeyIdException;
+use Spaze\Encryption\Exceptions\UnknownFormatMarkerException;
 use Spaze\Encryption\SymmetricKeyEncryption;
 use TypeError;
 
@@ -29,7 +32,7 @@ final readonly class SymmetricEncryptor implements AdditionalDataDecryptor, Addi
     {
         try {
             return $this->encryption->encrypt($plainText);
-        } catch (HaliteAlert | SodiumException | TypeError $exception) {
+        } catch (HaliteAlert | JsonException | SodiumException | TypeError $exception) {
             throw new EncryptionException($exception->getMessage(), $exception->getCode(), $exception);
         }
     }
@@ -46,6 +49,7 @@ final readonly class SymmetricEncryptor implements AdditionalDataDecryptor, Addi
         } catch (
             EncryptWithAdNeedsAdditionalDataException
             | HaliteAlert
+            | JsonException
             | SodiumException
             | TypeError $exception
         ) {
@@ -61,11 +65,14 @@ final readonly class SymmetricEncryptor implements AdditionalDataDecryptor, Addi
         try {
             return $this->encryption->decrypt($cipherText);
         } catch (
-            HaliteAlert
+            FormatMarkerMismatchException
+            | HaliteAlert
             | InvalidCipherTextFormatException
+            | JsonException
             | SodiumException
             | TypeError
-            | UnknownEncryptionKeyIdException $exception
+            | UnknownEncryptionKeyIdException
+            | UnknownFormatMarkerException $exception
         ) {
             throw new DecryptionException($exception->getMessage(), $exception->getCode(), $exception);
         }
@@ -80,11 +87,14 @@ final readonly class SymmetricEncryptor implements AdditionalDataDecryptor, Addi
             return $this->encryption->decryptWithAd($cipherText, $additionalData);
         } catch (
             DecryptWithAdNeedsAdditionalDataException
+            | FormatMarkerMismatchException
             | HaliteAlert
             | InvalidCipherTextFormatException
+            | JsonException
             | SodiumException
             | TypeError
-            | UnknownEncryptionKeyIdException $exception
+            | UnknownEncryptionKeyIdException
+            | UnknownFormatMarkerException $exception
         ) {
             throw new DecryptionException($exception->getMessage(), $exception->getCode(), $exception);
         }
@@ -96,7 +106,11 @@ final readonly class SymmetricEncryptor implements AdditionalDataDecryptor, Addi
             $this->encryption->needsReEncrypt($value);
 
             return true;
-        } catch (InvalidCipherTextFormatException) {
+        } catch (
+            FormatMarkerMismatchException
+            | InvalidCipherTextFormatException
+            | UnknownFormatMarkerException
+        ) {
             return false;
         }
     }
@@ -108,7 +122,11 @@ final readonly class SymmetricEncryptor implements AdditionalDataDecryptor, Addi
     {
         try {
             return $this->encryption->needsReEncrypt($value);
-        } catch (InvalidCipherTextFormatException $exception) {
+        } catch (
+            FormatMarkerMismatchException
+            | InvalidCipherTextFormatException
+            | UnknownFormatMarkerException $exception
+        ) {
             throw new DecryptionException($exception->getMessage(), $exception->getCode(), $exception);
         }
     }
