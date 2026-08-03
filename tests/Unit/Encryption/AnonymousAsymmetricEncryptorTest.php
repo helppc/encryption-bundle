@@ -136,6 +136,23 @@ final class AnonymousAsymmetricEncryptorTest extends TestCase
     }
 
     /**
+     * needsReEncryption() reads the envelope and nothing else, so an unknown key id is reported for
+     * re-encryption instead of rejected. Only the decrypt() that a migration sweep runs next fails.
+     *
+     * @throws DecryptionException
+     */
+    public function testAnUnknownKeyIdIsReportedForReEncryptionRatherThanRejected(): void
+    {
+        $vault = $this->vault();
+
+        self::assertTrue($vault->needsReEncryption('$v9$AnonV1$abc'));
+        self::assertTrue($vault->isEncrypted('$v9$AnonV1$abc'));
+
+        $this->expectException(DecryptionException::class);
+        $vault->decrypt('$v9$AnonV1$abc');
+    }
+
+    /**
      * @throws DecryptionException
      * @throws EncryptionException
      */

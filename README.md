@@ -248,8 +248,15 @@ if ($this->encryptor->needsReEncryption($cipherText)) {
 
 Once nothing reports `needsReEncryption()` any more, drop the old key.
 
-`needsReEncryption()` throws on a malformed value. Use `isEncrypted()` — which never throws — when
-scanning a column that still holds a mix of plain and encrypted values.
+Both `needsReEncryption()` and `isEncrypted()` are structural checks that decrypt nothing. They read
+the key id and the marker out of the envelope, and neither of them verifies that the key id is one
+of the configured ones, or that the payload authenticates. A structurally valid value carrying an
+unknown key id therefore reports `needsReEncryption() === true`, and only the `decrypt()` in the
+snippet above fails on it. Do not read a `true` as proof that the value belongs to this group.
+
+The difference between the two is what happens to a value that is not cipher text of this type at
+all: `needsReEncryption()` throws, `isEncrypted()` returns `false` and never throws. Use
+`isEncrypted()` when scanning a column that still holds a mix of plain and encrypted values.
 
 Always generate a fresh key for a new key id. How well the key id in a stored value is protected
 depends on the format and the type:
