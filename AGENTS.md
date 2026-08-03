@@ -17,8 +17,13 @@ composer phpunit     # tests
 
 ## Coding rules
 
-- Never write cryptographic primitives in this repository. All cryptography goes through
-  `spaze/encryption`; this bundle only wraps it in a typed facade and Symfony configuration.
+- Never write a cryptographic primitive or invent an encryption scheme in this repository. Every
+  encryption and decryption goes through `spaze/encryption`; this bundle only wraps it in a typed
+  facade and Symfony configuration.
+- Generating key material is the one exception, and it goes through the stable PHP libsodium API —
+  `random_bytes()`, `sodium_crypto_box_keypair()` and friends, as `GenerateEncryptionKeyCommand`
+  does. Upstream exposes no public API for it, and its key role enum is `@internal`, so do not
+  reach for that just to make the rule read shorter.
 - Every new PHP file must start with `declare(strict_types=1);`.
 - Follow PSR-12 and use typed parameters and return types.
 - Code must run on the PHP version specified in `composer.json` (currently `>=8.4`).
