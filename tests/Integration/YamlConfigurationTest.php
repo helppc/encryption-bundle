@@ -41,14 +41,17 @@ final class YamlConfigurationTest extends TestCase
     public function testEnumTagAndPlainStringBuildTheSameKindOfGroups(): void
     {
         $kernel = $this->boot();
-        $consumer = $this->consumer($kernel);
 
-        self::assertInstanceOf(SymmetricEncryptor::class, $consumer->encryptor);
-        self::assertInstanceOf(AnonymousAsymmetricEncryptor::class, $consumer->vault);
-        self::assertInstanceOf(WriteOnlyAnonymousAsymmetricEncryptor::class, $consumer->partnerInbox);
-        self::assertInstanceOf(AsymmetricEncryptor::class, $consumer->peer);
+        try {
+            $consumer = $this->consumer($kernel);
 
-        $this->shutdown($kernel);
+            self::assertInstanceOf(SymmetricEncryptor::class, $consumer->encryptor);
+            self::assertInstanceOf(AnonymousAsymmetricEncryptor::class, $consumer->vault);
+            self::assertInstanceOf(WriteOnlyAnonymousAsymmetricEncryptor::class, $consumer->partnerInbox);
+            self::assertInstanceOf(AsymmetricEncryptor::class, $consumer->peer);
+        } finally {
+            $this->shutdown($kernel);
+        }
     }
 
     /**
@@ -58,15 +61,44 @@ final class YamlConfigurationTest extends TestCase
     public function testGroupsDeclaredWithTheEnumTagActuallyWork(): void
     {
         $kernel = $this->boot();
-        $consumer = $this->consumer($kernel);
 
-        $sealed = $consumer->partnerInbox->encrypt('Ke Karlovu 2027/3');
-        self::assertSame('Ke Karlovu 2027/3', $consumer->vault->decrypt($sealed));
+        try {
+            $consumer = $this->consumer($kernel);
 
-        $bound = $consumer->peer->encryptWithAdditionalData('Malostranské náměstí 25', 'tenant-42');
-        self::assertNotSame('Malostranské náměstí 25', $bound);
+            $sealed = $consumer->partnerInbox->encrypt('Ke Karlovu 2027/3');
+            self::assertSame('Ke Karlovu 2027/3', $consumer->vault->decrypt($sealed));
 
-        $this->shutdown($kernel);
+            $bound = $consumer->peer->encryptWithAdditionalData('Malostranské náměstí 25', 'tenant-42');
+            self::assertNotSame('Malostranské náměstí 25', $bound);
+            self::assertSame(
+                'Malostranské náměstí 25',
+                $consumer->peerReader->decryptWithAdditionalData($bound, 'tenant-42'),
+            );
+        } finally {
+            $this->shutdown($kernel);
+        }
+    }
+
+    /**
+     * The additional data is only bound when it is byte identical, which is what makes a cipher
+     * text unusable in another row or another tenant.
+     *
+     * @throws DecryptionException
+     * @throws EncryptionException
+     */
+    public function testTheYamlConfiguredPeerBindsItsAdditionalData(): void
+    {
+        $kernel = $this->boot();
+
+        try {
+            $consumer = $this->consumer($kernel);
+            $bound = $consumer->peer->encryptWithAdditionalData('Malostranské náměstí 25', 'tenant-42');
+
+            $this->expectException(DecryptionException::class);
+            $consumer->peerReader->decryptWithAdditionalData($bound, 'tenant-43');
+        } finally {
+            $this->shutdown($kernel);
+        }
     }
 
     private function boot(): TestKernel
