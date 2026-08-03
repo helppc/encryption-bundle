@@ -6,9 +6,8 @@ on:
     paths:
       - '.github/workflows/ci.yaml'
       - '.github/workflows/reusable-checks.yaml'
-      - '**/*.php'
-      - 'src'
-      - 'tests'
+      - 'src/**'
+      - 'tests/**'
       - 'composer.json'
       - 'composer.lock'
       - 'phpcs.xml'
@@ -23,9 +22,8 @@ on:
     paths:
       - '.github/workflows/ci.yaml'
       - '.github/workflows/reusable-checks.yaml'
-      - '**/*.php'
-      - 'src'
-      - 'tests'
+      - 'src/**'
+      - 'tests/**'
       - 'composer.json'
       - 'composer.lock'
       - 'phpcs.xml'
