@@ -289,6 +289,23 @@ final class EncryptionBundleTest extends TestCase
         ]);
     }
 
+    /**
+     * A prototyped node always has a default value, so leaving "keys" out entirely used to pass the
+     * config component and fail later than the same group with an explicitly empty list.
+     */
+    public function testAGroupWithNoKeysNodeAtAllIsRejected(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->load([
+            'groups' => [
+                'default' => [
+                    'key_prefix' => TestKeys::PREFIX,
+                    'active_key' => 'v1',
+                ],
+            ],
+        ]);
+    }
+
     public function testConfigurationWithoutAnyGroupIsRejected(): void
     {
         $this->expectException(InvalidConfigurationException::class);

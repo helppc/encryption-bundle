@@ -66,6 +66,7 @@ final class EncryptionBundle extends AbstractBundle
                                 ->info('Key id for new values. The others stay configured so old values stay readable.')
                             ->end()
                             ->arrayNode('keys')
+                                ->isRequired()
                                 ->useAttributeAsKey('id')
                                 ->requiresAtLeastOneElement()
                                 ->arrayPrototype()
