@@ -25,6 +25,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `symfony/framework-bundle` moved to `require-dev`. No production class of this bundle references
   it, so installing the bundle no longer pulls in the whole framework.
 
+### Fixed
+
+Documentation that promised more than the implementation delivers. No behaviour changed by these,
+but code written against the old wording may have been resting on a guarantee that was not there:
+
+- `InvalidEncryptionConfigurationException` was described as thrown while the container is built.
+  Only the shape of the configuration fails there; key material — prefix, encoding, length, role,
+  key pair — is validated when the encryption service is created, because resolving `%env()%` at
+  compile time would write the keys into `var/cache/`.
+- `needsReEncryption()` promised a `DecryptionException` for anything that is not cipher text of
+  this group. It is a structural check: it verifies neither that the key id is configured nor that
+  the payload authenticates, so a structurally valid value with an unknown key id reports `true`.
+- The key id was described as travelling unauthenticated in every value. Since upstream 3.0 that
+  holds only for `anonymous_asymmetric` and for values written without a marker; the new
+  `symmetric` and `asymmetric` format binds the key id and the marker into what decryption verifies.
+- The keygen prefix section read as if a prefix containing `_` were invalid configuration. It is a
+  rule of the command; a matching `key_prefix` with an underscore works at runtime.
+
 ## [1.0.0] - 2026-08-03
 
 ### Added
