@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace HelpPC\EncryptionBundle\Tests\Fixture;
 
+use HelpPC\EncryptionBundle\Encryption\AdditionalDataDecryptor;
 use HelpPC\EncryptionBundle\Encryption\AdditionalDataEncryptor;
 use HelpPC\EncryptionBundle\Encryption\Decryptor;
 use HelpPC\EncryptionBundle\Encryption\Encryptor;
@@ -17,6 +18,7 @@ final readonly class YamlConfiguredConsumer
         #[Target('vault')] public Decryptor $vault,
         #[Target('partner_inbox')] public Encryptor $partnerInbox,
         #[Target('peer')] public AdditionalDataEncryptor $peer,
+        #[Target('peer')] public AdditionalDataDecryptor $peerReader,
     ) {
     }
 }

@@ -31,13 +31,16 @@ final class ContainerTest extends TestCase
     public function testGroupsAreWiredAndUsable(): void
     {
         $kernel = $this->boot([AddressEncryption::class]);
-        $consumer = $this->consumer($kernel);
 
-        self::assertInstanceOf(SymmetricEncryptor::class, $consumer->encryptor);
-        self::assertInstanceOf(AnonymousAsymmetricEncryptor::class, $consumer->vault);
-        self::assertInstanceOf(WriteOnlyAnonymousAsymmetricEncryptor::class, $consumer->partnerInbox);
+        try {
+            $consumer = $this->consumer($kernel);
 
-        $this->shutdown($kernel);
+            self::assertInstanceOf(SymmetricEncryptor::class, $consumer->encryptor);
+            self::assertInstanceOf(AnonymousAsymmetricEncryptor::class, $consumer->vault);
+            self::assertInstanceOf(WriteOnlyAnonymousAsymmetricEncryptor::class, $consumer->partnerInbox);
+        } finally {
+            $this->shutdown($kernel);
+        }
     }
 
     /**
@@ -47,18 +50,24 @@ final class ContainerTest extends TestCase
     public function testTheDefaultGroupEncryptsAndDecrypts(): void
     {
         $kernel = $this->boot([AddressEncryption::class]);
-        $consumer = $this->consumer($kernel);
 
-        $cipherText = $consumer->encryptor->encrypt('Ke Karlovu 2027/3');
-        self::assertSame('Ke Karlovu 2027/3', $consumer->decryptor->decrypt($cipherText));
+        try {
+            $consumer = $this->consumer($kernel);
 
-        $bound = $consumer->additionalDataEncryptor->encryptWithAdditionalData('Ke Karlovu 2027/3', 'tenant-42');
-        self::assertSame(
-            'Ke Karlovu 2027/3',
-            $consumer->additionalDataDecryptor->decryptWithAdditionalData($bound, 'tenant-42'),
-        );
+            $cipherText = $consumer->encryptor->encrypt('Ke Karlovu 2027/3');
+            self::assertSame('Ke Karlovu 2027/3', $consumer->decryptor->decrypt($cipherText));
 
-        $this->shutdown($kernel);
+            $bound = $consumer->additionalDataEncryptor->encryptWithAdditionalData(
+                'Ke Karlovu 2027/3',
+                'tenant-42',
+            );
+            self::assertSame(
+                'Ke Karlovu 2027/3',
+                $consumer->additionalDataDecryptor->decryptWithAdditionalData($bound, 'tenant-42'),
+            );
+        } finally {
+            $this->shutdown($kernel);
+        }
     }
 
     /**
@@ -68,12 +77,15 @@ final class ContainerTest extends TestCase
     public function testWhatTheWriteOnlyGroupSealsIsReadableWhereTheSecretKeyLives(): void
     {
         $kernel = $this->boot([AddressEncryption::class]);
-        $consumer = $this->consumer($kernel);
 
-        $sealed = $consumer->partnerInbox->encrypt('Ke Karlovu 2027/3');
-        self::assertSame('Ke Karlovu 2027/3', $consumer->vault->decrypt($sealed));
+        try {
+            $consumer = $this->consumer($kernel);
 
-        $this->shutdown($kernel);
+            $sealed = $consumer->partnerInbox->encrypt('Ke Karlovu 2027/3');
+            self::assertSame('Ke Karlovu 2027/3', $consumer->vault->decrypt($sealed));
+        } finally {
+            $this->shutdown($kernel);
+        }
     }
 
     public function testReadingAWriteOnlyGroupFailsWhileTheContainerIsCompiled(): void
