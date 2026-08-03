@@ -107,6 +107,23 @@ final class SymmetricEncryptorTest extends TestCase
     }
 
     /**
+     * needsReEncryption() reads the envelope and nothing else, so an unknown key id is reported for
+     * re-encryption instead of rejected. Only the decrypt() that a migration sweep runs next fails.
+     *
+     * @throws DecryptionException
+     */
+    public function testAnUnknownKeyIdIsReportedForReEncryptionRatherThanRejected(): void
+    {
+        $encryptor = $this->encryptor();
+
+        self::assertTrue($encryptor->needsReEncryption('$v9$SymV1$abc'));
+        self::assertTrue($encryptor->isEncrypted('$v9$SymV1$abc'));
+
+        $this->expectException(DecryptionException::class);
+        $encryptor->decrypt('$v9$SymV1$abc');
+    }
+
+    /**
      * @throws DecryptionException
      * @throws EncryptionException
      */

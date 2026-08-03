@@ -115,6 +115,23 @@ final class AsymmetricEncryptorTest extends TestCase
     }
 
     /**
+     * needsReEncryption() reads the envelope and nothing else, so an unknown key id is reported for
+     * re-encryption instead of rejected. Only the decrypt() that a migration sweep runs next fails.
+     *
+     * @throws DecryptionException
+     */
+    public function testAnUnknownKeyIdIsReportedForReEncryptionRatherThanRejected(): void
+    {
+        $alice = $this->alice();
+
+        self::assertTrue($alice->needsReEncryption('$v9$AuthV1$abc'));
+        self::assertTrue($alice->isEncrypted('$v9$AuthV1$abc'));
+
+        $this->expectException(DecryptionException::class);
+        $alice->decrypt('$v9$AuthV1$abc');
+    }
+
+    /**
      * @throws DecryptionException
      * @throws EncryptionException
      */

@@ -23,7 +23,17 @@ interface Encryptor
     public function isEncrypted(string $value): bool;
 
     /**
-     * @throws DecryptionException when the value is not cipher text of this group
+     * True when the value carries a key id other than the active one, or no format marker at all,
+     * which is how values written before the marker existed look.
+     *
+     * The check is structural, like isEncrypted(): it reads the envelope and the marker, and it
+     * decrypts nothing. It does not verify that the key id is one of the configured ones, and it
+     * does not authenticate the payload — a value with an unknown key id reports true, and only
+     * decrypt() then fails. Migration code must not read this as proof that the value belongs to
+     * this group.
+     *
+     * @throws DecryptionException when the value is not shaped like cipher text at all, or carries
+     *                             a marker written by a different encryption type
      */
     public function needsReEncryption(string $value): bool;
 }
