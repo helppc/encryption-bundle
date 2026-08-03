@@ -22,6 +22,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **BREAKING**: an `anonymous_asymmetric` key with an explicitly empty `secret_key` is now rejected
   while the container is compiled. It used to be treated as no secret key at all, which silently
   turned the group write-only. Leave `secret_key` out to get a write-only group.
+- `symfony/framework-bundle` moved to `require-dev`. No production class of this bundle references
+  it, so installing the bundle no longer pulls in the whole framework.
 
 ## [1.0.0] - 2026-08-03
 
