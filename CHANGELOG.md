@@ -24,6 +24,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   turned the group write-only. Leave `secret_key` out to get a write-only group.
 - `symfony/framework-bundle` moved to `require-dev`. No production class of this bundle references
   it, so installing the bundle no longer pulls in the whole framework.
+- A group that leaves `keys` out entirely is now rejected by Symfony's config component with
+  `InvalidConfigurationException`, the same as a group with an explicitly empty list and the same as
+  a missing `key_prefix` or `active_key`. It used to reach the extension and fail there with
+  `InvalidEncryptionConfigurationException`. The configuration was invalid either way and the moment
+  of failure has not moved; only the exception class has.
 
 ### Fixed
 
