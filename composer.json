@@ -13,7 +13,7 @@
   "require": {
     "php": ">=8.4",
     "ext-sodium": "*",
-    "spaze/encryption": "dev-main",
+    "spaze/encryption": "^3.0",
     "symfony/config": "^8.0",
     "symfony/console": "^8.0",
     "symfony/dependency-injection": "^8.0",
@@ -78,6 +78,6 @@
       "/tests"
     ]
   },
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "prefer-stable": true
 }

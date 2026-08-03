@@ -31,11 +31,6 @@ composer phpunit     # tests
 
 ## Dependency note
 
-`spaze/encryption` is required as `dev-main` because asymmetric encryption is merged upstream
-but not tagged yet — the latest tag, `v2.3.2`, only ships `SymmetricKeyEncryption`. Once a tag
-containing the asymmetric classes is released, narrow the constraint to that version and set
-`minimum-stability` back to `stable`.
-
 Only classes that exist in **upstream** `spaze/encryption` may be referenced. The
 `helppc/encryption` fork carries extra contracts and a marker exception interface that upstream
 does not have; this bundle must not depend on them.

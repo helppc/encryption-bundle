@@ -13,19 +13,13 @@ when the container is compiled rather than at runtime.
 - PHP >= 8.4
 - `ext-sodium`
 - Symfony 8
+- `spaze/encryption` ^3.0
 
 ## Installation
 
 ```bash
-composer config minimum-stability dev
-composer config prefer-stable true
 composer require helppc/encryption-bundle
 ```
-
-> The two `config` lines are needed, and `composer require` alone fails without them.
-> `spaze/encryption` is required as `dev-main`: its asymmetric classes are merged upstream but not
-> tagged yet, the latest tag `v2.3.2` ships only `SymmetricKeyEncryption`. `prefer-stable` keeps
-> every other dependency on its stable release. Both lines go away once a suitable tag exists.
 
 Register the bundle in `config/bundles.php`:
 
