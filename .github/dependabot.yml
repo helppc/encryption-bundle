@@ -1,6 +1,4 @@
 version: 2
-# Note: spaze/encryption is pulled from the helppc/encryption fork as a dev branch over VCS.
-# Dependabot cannot update that, so it has to be watched by hand until the fork is on Packagist.
 updates:
   - package-ecosystem: "composer"
     directory: "/"
