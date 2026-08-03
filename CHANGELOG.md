@@ -14,6 +14,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   new write.
 - PHP 8.5 to the CI matrix, so the suite runs on every version `composer.json` allows, not only on
   the lowest one.
+- A deprecation policy that actually holds: a deprecation this bundle triggers itself fails the
+  test run, one reached through a Symfony internal does not.
 
 ### Changed
 

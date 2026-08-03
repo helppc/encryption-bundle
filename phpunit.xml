@@ -9,6 +9,7 @@
          beStrictAboutCoverageMetadata="true"
          beStrictAboutOutputDuringTests="true"
          displayDetailsOnPhpunitDeprecations="true"
+         failOnDeprecation="true"
          failOnPhpunitDeprecation="true"
          failOnRisky="true"
          failOnWarning="true">
@@ -21,16 +22,27 @@
         </testsuite>
     </testsuites>
 
-    <source ignoreIndirectDeprecations="true" restrictNotices="true" restrictWarnings="true">
+    <!--
+        A deprecation this bundle triggers itself fails the run; one reached through a Symfony
+        internal does not. Symfony raises deprecations through trigger_deprecation(), which wraps
+        @trigger_error(), so both the trigger has to be named and the suppression ignored, or none
+        of them would ever be seen.
+    -->
+    <source ignoreIndirectDeprecations="true"
+            ignoreSuppressionOfDeprecations="true"
+            restrictNotices="true"
+            restrictWarnings="true">
         <include>
             <directory>src</directory>
         </include>
+        <deprecationTrigger>
+            <function>trigger_deprecation</function>
+        </deprecationTrigger>
     </source>
     <php>
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
         <server name="APP_ENV" value="test" />
         <server name="SHELL_VERBOSITY" value="-1" />
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
     </php>
 </phpunit>
