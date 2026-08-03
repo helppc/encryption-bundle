@@ -10,13 +10,18 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   checks:
-    name: "🦉 Reusable Nightly QA"
+    name: "🦉 Reusable Nightly QA (PHP ${{ matrix.php-version }})"
     uses: ./.github/workflows/reusable-checks.yaml
     secrets: inherit
-    with:
-      php_version: ${{ matrix.php-versions }}
     strategy:
+      fail-fast: false
       matrix:
-        php-versions: ['8.4']
+        # composer.json requires php >=8.4, so both versions that satisfies have to be covered.
+        php-version: ['8.4', '8.5']
+    with:
+      php_version: ${{ matrix.php-version }}
