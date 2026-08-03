@@ -82,6 +82,21 @@ final class AsymmetricEncryptorTest extends TestCase
     }
 
     /**
+     * Empty additional data is refused on the way back too, rather than read as "no additional data"
+     * and quietly failing authentication instead.
+     *
+     * @throws DecryptionException
+     * @throws EncryptionException
+     */
+    public function testAdditionalDataCannotBeEmptyWhenDecrypting(): void
+    {
+        $cipherText = $this->alice()->encryptWithAdditionalData('Ke Karlovu 2027/3', 'tenant-42');
+
+        $this->expectException(DecryptionException::class);
+        $this->bob()->decryptWithAdditionalData($cipherText, '');
+    }
+
+    /**
      * @throws DecryptionException
      * @throws EncryptionException
      */
