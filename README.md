@@ -249,6 +249,26 @@ scanning a column that still holds a mix of plain and encrypted values.
 Always generate a fresh key for a new key id. The key id travels in the cipher text
 unauthenticated, so two ids must never point at the same key.
 
+### Upgrading to `spaze/encryption` 3.0
+
+> [!WARNING]
+> Upgrade every deployment that **reads** the data before any of them starts **writing** it.
+
+Version 3 writes a new cipher text format carrying a marker that says which method created the
+value, `$<keyId>$<marker>$<cipherText>`. Versions before it wrote `$<keyId>$<cipherText>` and cannot
+read a value that has a marker in it. When several deployments share the same database — a rolling
+deploy, a worker fleet, a read replica of the same rows — one of them upgrading first and writing a
+single value is enough to hand the others data they cannot decrypt.
+
+So either upgrade all of them before the first new write, or stop writing for the duration of the
+upgrade. There is no format flag to turn the marker off.
+
+Nothing is lost the other way round: values written by version 2 keep decrypting, and
+`needsReEncryption()` reports them, so the usual re-encryption sweep migrates them to the marked
+format. Until then, they keep the [weaker guarantees](#key-rotation) of the unmarked format.
+
+Upstream release notes: <https://github.com/spaze/encryption/releases/tag/v3.0.0>
+
 ### Exceptions
 
 | Exception | When |
@@ -265,6 +285,11 @@ composer phpstan      # static analysis, level 10
 composer rector:check # automated refactors
 composer phpunit      # tests
 ```
+
+Before tagging a release, read the breaking change and migration notes of every upstream package
+that changed, `spaze/encryption` above all: a new cipher text format there is a coordination problem
+for everyone deploying this bundle, and it belongs in [`CHANGELOG.md`](CHANGELOG.md) and in the
+release notes, not only in the dependency bump.
 
 ## License
 
