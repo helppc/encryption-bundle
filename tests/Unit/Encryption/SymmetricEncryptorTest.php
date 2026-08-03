@@ -80,6 +80,22 @@ final class SymmetricEncryptorTest extends TestCase
     }
 
     /**
+     * Empty additional data is refused on the way back too, rather than read as "no additional data"
+     * and quietly failing authentication instead.
+     *
+     * @throws DecryptionException
+     * @throws EncryptionException
+     */
+    public function testAdditionalDataCannotBeEmptyWhenDecrypting(): void
+    {
+        $encryptor = $this->encryptor();
+        $cipherText = $encryptor->encryptWithAdditionalData('Ke Karlovu 2027/3', 'tenant-42');
+
+        $this->expectException(DecryptionException::class);
+        $encryptor->decryptWithAdditionalData($cipherText, '');
+    }
+
+    /**
      * @throws DecryptionException
      * @throws EncryptionException
      */

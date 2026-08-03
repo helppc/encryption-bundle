@@ -62,6 +62,27 @@ final class AnonymousAsymmetricEncryptorTest extends TestCase
         self::assertNotContains(Decryptor::class, $implemented);
     }
 
+    /**
+     * A write-only group cannot read what it wrote, but it still has to recognise it: a rotation
+     * sweep needs isEncrypted() and needsReEncryption() to answer for values it can never decrypt.
+     *
+     * @throws DecryptionException
+     * @throws EncryptionException
+     */
+    public function testAWriteOnlyGroupStillRecognisesItsOwnCipherText(): void
+    {
+        $current = $this->writeOnly('v2');
+        $writtenWithV1 = $this->writeOnly('v1')->encrypt('Ke Karlovu 2027/3');
+
+        self::assertTrue($current->isEncrypted($writtenWithV1));
+        self::assertFalse($current->isEncrypted('Ke Karlovu 2027/3'));
+        self::assertTrue($current->needsReEncryption($writtenWithV1));
+        self::assertFalse($current->needsReEncryption($current->encrypt('Ke Karlovu 2027/3')));
+
+        $this->expectException(DecryptionException::class);
+        $current->needsReEncryption('Ke Karlovu 2027/3');
+    }
+
     public function testAnonymousGroupsOfferNoAdditionalData(): void
     {
         $readable = $this->interfacesOf(AnonymousAsymmetricEncryptor::class);
