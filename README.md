@@ -5,8 +5,10 @@ Symfony bundle exposing a typed encryption facade over
 [Halite](https://github.com/paragonie/halite) on top of [libsodium](https://php.net/sodium).
 
 The bundle implements no cryptography of its own. It contributes configuration, dependency
-injection, key rotation ergonomics, and interfaces narrow enough that a misconfigured group fails
-when the container is compiled rather than at runtime.
+injection, key rotation ergonomics, and interfaces narrow enough that asking a group for something
+it cannot do — reading a write-only group, binding additional data to a sealed box — fails while the
+container is compiled rather than on the first request in production. Key material itself is
+validated when the encryption service is created; see [Exceptions](#exceptions).
 
 ## Requirements
 
@@ -42,8 +44,11 @@ $ bin/console encryption:generate-key --asymmetric --prefix=vault
 ```
 
 The prefix is free-form and makes a leaked credential identifiable — usually an initialism of its
-purpose, `adek` for *address data encryption key*. It must not contain `_`, which separates the
-prefix from the key.
+purpose, `adek` for *address data encryption key*. The command refuses a prefix containing `_`,
+because `_` separates the prefix from the key and from the optional `public`/`secret` role tag, and
+the command's output would stop being readable in one direction. It is a rule of the command, not a
+validation of the configuration: a key whose prefix contains `_` is accepted at runtime, as long as
+`key_prefix` says exactly the same thing.
 
 Put the values in `.env.local` and reference them with `%env()%`. A key written literally into a
 YAML file ends up in plain text in the compiled container under `var/cache/`, which leaks into
@@ -246,8 +251,20 @@ Once nothing reports `needsReEncryption()` any more, drop the old key.
 `needsReEncryption()` throws on a malformed value. Use `isEncrypted()` — which never throws — when
 scanning a column that still holds a mix of plain and encrypted values.
 
-Always generate a fresh key for a new key id. The key id travels in the cipher text
-unauthenticated, so two ids must never point at the same key.
+Always generate a fresh key for a new key id. How well the key id in a stored value is protected
+depends on the format and the type:
+
+| Value | Key id and marker |
+|---|---|
+| `symmetric` or `asymmetric`, written by `spaze/encryption` 3.0 and later | authenticated — they go into what decryption verifies, so editing either makes decryption fail |
+| `anonymous_asymmetric`, any version | not authenticated — a sealed box has nowhere to carry the verification |
+| any type, written before 3.0, without a marker | not authenticated |
+
+Where they are not authenticated, editing the stored key id only makes decryption reach for a
+different key, and it fails because that key is a different one. That is the whole reason two ids
+must never point at the same key: a value moved between them would then decrypt under both. The rule
+holds for every group, because the anonymous type never gets the protection and pre-3.0 values never
+had it.
 
 ### Upgrading to `spaze/encryption` 3.0
 
@@ -275,7 +292,27 @@ Upstream release notes: <https://github.com/spaze/encryption/releases/tag/v3.0.0
 |---|---|
 | `EncryptionException` | encryption failed; checked |
 | `DecryptionException` | malformed cipher text, unknown key id, wrong format, or failed authentication; checked |
-| `InvalidEncryptionConfigurationException` | a group cannot be built from its configuration; unchecked, thrown while the container is built |
+| `InvalidEncryptionConfigurationException` | a group cannot be built from its configuration; unchecked |
+
+`InvalidEncryptionConfigurationException` is thrown at two different moments, and the difference
+matters for what a deploy can still discover after a green build:
+
+| Fails while the container is compiled | Fails when the encryption service is created |
+|---|---|
+| the shape of the configuration: a `default_group` naming a group that does not exist, more than one group and no default, a key missing the component its type needs (`key`, `public_key`, `secret_key`), an `anonymous_asymmetric` group defining `secret_key` for some of its keys but not all | the key material: a wrong prefix, a value that is not hexadecimal, a key that does not decode to 32 bytes, a `secret` key where a `public` one belongs, a public key that does not belong to its secret key, an `active_key` that is not among the keys |
+
+Two more kinds of error fail at compile time without going through this exception. A group with no
+`key_prefix`, `active_key` or `keys` at all is rejected by Symfony's config component with
+`InvalidConfigurationException`, the same way an unknown `type` is. And a type error — type-hinting
+`Decryptor` for a write-only group, or `AdditionalDataEncryptor` for an anonymous one — cannot be
+autowired, which is what the narrow interfaces are for.
+
+Key material is deliberately left for later. The keys come from `%env()%`, and resolving them while
+the container is compiled would write them into `var/cache/` — exactly what
+[Generating keys](#generating-keys) warns against. So the container builds, boots, and the group
+throws on the first `get()` of its service. `tests/Integration/ContainerTest.php` covers both halves
+of this: `testReadingAWriteOnlyGroupFailsWhileTheContainerIsCompiled()` and
+`testMisconfiguredGroupFailsWhenTheServiceIsBuilt()`.
 
 ## Development
 
