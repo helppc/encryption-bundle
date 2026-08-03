@@ -112,6 +112,11 @@ For `anonymous_asymmetric`, either every key of the group defines `secret_key` o
 mixed state is rejected: a group that can decrypt has to be able to decrypt data encrypted with
 its older keys too.
 
+A group goes write-only by leaving `secret_key` out, not by setting it to an empty string. An
+explicit `secret_key: ''` is rejected, because a config generator emitting an empty value would
+otherwise silently take away the ability to decrypt, and nothing would notice until something asked
+that group for a `Decryptor`.
+
 ### Naming the type through the enum
 
 `type` is backed by the `HelpPC\EncryptionBundle\EncryptionType` enum. Plain strings keep working,

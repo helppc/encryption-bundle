@@ -13,6 +13,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   format that older deployments cannot read, so every reader has to be upgraded before the first
   new write.
 
+### Changed
+
+- **BREAKING**: an `anonymous_asymmetric` key with an explicitly empty `secret_key` is now rejected
+  while the container is compiled. It used to be treated as no secret key at all, which silently
+  turned the group write-only. Leave `secret_key` out to get a write-only group.
+
 ## [1.0.0] - 2026-08-03
 
 ### Added
