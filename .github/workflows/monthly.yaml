@@ -1,8 +1,9 @@
-name: "🦉 Nightly Quality Suite"
-run-name: "${{ github.actor }} running nightly QA"
+name: "🦉 Monthly Quality Suite"
+run-name: "${{ github.actor }} running monthly QA"
 
 on:
   schedule:
+    # 03:00 UTC on the first day of every month.
     - cron: '0 3 1 * *'
   workflow_dispatch: ~
 
@@ -15,7 +16,7 @@ permissions:
 
 jobs:
   checks:
-    name: "🦉 Reusable Nightly QA (PHP ${{ matrix.php-version }})"
+    name: "🦉 Reusable Monthly QA (PHP ${{ matrix.php-version }})"
     uses: ./.github/workflows/reusable-checks.yaml
     secrets: inherit
     strategy:
