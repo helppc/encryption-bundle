@@ -232,9 +232,22 @@ Additional data cryptographically binds a cipher text to a context — a row id,
 tenant id. It is authenticated but **not encrypted**, so it must not be a secret. It prevents a
 valid cipher text from being copied from one place to another.
 
+The methods live on the extended interfaces, so those are what a consumer type-hints:
+
 ```php
-$cipherText = $this->encryptor->encryptWithAdditionalData($addressData, $tenantId);
-$plainText  = $this->decryptor->decryptWithAdditionalData($cipherText, $tenantId);
+use HelpPC\EncryptionBundle\Encryption\AdditionalDataDecryptor;
+use HelpPC\EncryptionBundle\Encryption\AdditionalDataEncryptor;
+
+public function __construct(
+    private AdditionalDataEncryptor $aadEncryptor,
+    private AdditionalDataDecryptor $aadDecryptor,
+) {
+}
+```
+
+```php
+$cipherText = $this->aadEncryptor->encryptWithAdditionalData($addressData, $tenantId);
+$plainText  = $this->aadDecryptor->decryptWithAdditionalData($cipherText, $tenantId);
 ```
 
 The value must be non-empty and **byte identical** on both sides, otherwise decryption fails. Not
