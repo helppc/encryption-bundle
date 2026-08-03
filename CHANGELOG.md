@@ -12,6 +12,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - README section on upgrading to `spaze/encryption` 3.0: version 3 writes a marked cipher text
   format that older deployments cannot read, so every reader has to be upgraded before the first
   new write.
+- PHP 8.5 to the CI matrix, so the suite runs on every version `composer.json` allows, not only on
+  the lowest one.
 
 ### Changed
 

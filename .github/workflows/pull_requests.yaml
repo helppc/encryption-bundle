@@ -10,6 +10,12 @@ concurrency:
   group: "${{ github.workflow }}-${{github.head_ref || github.ref_name}}-assign-pr-author"
   cancel-in-progress: false
 
+# The action calls issues.addAssignees, which is the issues endpoint applied to a pull request,
+# so both scopes are needed. Nothing here checks the repository out, hence no contents access.
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   assignAuthor:
     name: Assign Author
