@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-08-03
+
 ### Added
 
 - README section on upgrading to `spaze/encryption` 3.0: version 3 writes a marked cipher text
@@ -63,5 +65,6 @@ but code written against the old wording may have been resting on a guarantee th
 
 - Requires the stable upstream `spaze/encryption` `^3.0` instead of a fork.
 
-[Unreleased]: https://github.com/helppc/encryption-bundle/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/helppc/encryption-bundle/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/helppc/encryption-bundle/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/helppc/encryption-bundle/releases/tag/v1.0.0
