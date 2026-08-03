@@ -191,9 +191,18 @@ final class EncryptionBundle extends AbstractBundle
             $id = (string) $id;
             $publicKeys[$id] = $this->keyComponent($name, $id, $key, 'public_key');
             $secret = is_array($key) ? ($key['secret_key'] ?? null) : null;
-            if (is_string($secret) && $secret !== '') {
-                $secretKeys[$id] = $secret;
+            if ($secret === '') {
+                throw new InvalidEncryptionConfigurationException(sprintf(
+                    'Key "%s" of encryption group "%s" has an empty "secret_key". Leave it out to '
+                    . 'make the group write-only; an empty value is not the same thing.',
+                    $id,
+                    $name,
+                ));
             }
+            if (!is_string($secret)) {
+                continue;
+            }
+            $secretKeys[$id] = $secret;
         }
 
         if ($secretKeys !== [] && count($secretKeys) !== count($publicKeys)) {

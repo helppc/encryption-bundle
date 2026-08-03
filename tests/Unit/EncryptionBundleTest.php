@@ -56,6 +56,31 @@ final class EncryptionBundleTest extends TestCase
         );
     }
 
+    /**
+     * A group goes write-only by leaving the secret key out, not by templating an empty one into
+     * the configuration. Accepting '' would let a broken config generator silently take away the
+     * ability to decrypt, and nothing would notice until a consumer asked for a Decryptor.
+     */
+    public function testAnonymousGroupWithAnExplicitlyEmptySecretKeyIsRejected(): void
+    {
+        $this->expectException(InvalidEncryptionConfigurationException::class);
+        $this->load([
+            'groups' => [
+                'vault' => [
+                    'type' => 'anonymous_asymmetric',
+                    'key_prefix' => TestKeys::PREFIX,
+                    'active_key' => 'v1',
+                    'keys' => [
+                        'v1' => [
+                            'public_key' => TestKeys::ALICE_PUBLIC_V1,
+                            'secret_key' => '',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testWriteOnlyGroupGetsNoDecryptorAlias(): void
     {
         $builder = $this->load([
