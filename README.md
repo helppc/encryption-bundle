@@ -14,7 +14,7 @@ validated when the encryption service is created; see [Exceptions](#exceptions).
 
 - PHP >= 8.4
 - `ext-sodium`
-- Symfony 8
+- Symfony 7.4 or 8
 - `spaze/encryption` ^3.0
 
 ## Installation

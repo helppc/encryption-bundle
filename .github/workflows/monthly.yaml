@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   checks:
-    name: "🦉 Reusable Monthly QA (PHP ${{ matrix.php-version }})"
+    name: "🦉 Reusable Monthly QA (PHP ${{ matrix.php-version }}, Symfony ${{ matrix.symfony-version }})"
     uses: ./.github/workflows/reusable-checks.yaml
     secrets: inherit
     strategy:
@@ -24,5 +24,7 @@ jobs:
       matrix:
         # composer.json requires php >=8.4, so both versions that satisfies have to be covered.
         php-version: ['8.4', '8.5']
+        symfony-version: ['7.4.*', '8.*']
     with:
       php_version: ${{ matrix.php-version }}
+      symfony_version: ${{ matrix.symfony-version }}

@@ -14,10 +14,10 @@
     "php": ">=8.4",
     "ext-sodium": "*",
     "spaze/encryption": "^3.0",
-    "symfony/config": "^8.0",
-    "symfony/console": "^8.0",
-    "symfony/dependency-injection": "^8.0",
-    "symfony/http-kernel": "^8.0"
+    "symfony/config": "^7.4 || ^8.0",
+    "symfony/console": "^7.4 || ^8.0",
+    "symfony/dependency-injection": "^7.4 || ^8.0",
+    "symfony/http-kernel": "^7.4 || ^8.0"
   },
   "autoload": {
     "psr-4": {
@@ -54,10 +54,10 @@
     "shipmonk/phpstan-rules": "^4.2",
     "slevomat/coding-standard": "^8.27",
     "squizlabs/php_codesniffer": "^4.0",
-    "symfony/error-handler": "^8.0",
-    "symfony/filesystem": "^8.0",
-    "symfony/framework-bundle": "^8.0",
-    "symfony/yaml": "^8.0"
+    "symfony/error-handler": "^7.4 || ^8.0",
+    "symfony/filesystem": "^7.4 || ^8.0",
+    "symfony/framework-bundle": "^7.4 || ^8.0",
+    "symfony/yaml": "^7.4 || ^8.0"
   },
   "config": {
     "optimize-autoloader": true,
