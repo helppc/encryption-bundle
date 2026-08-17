@@ -22,6 +22,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use function sprintf;
+use function sys_get_temp_dir;
 
 #[CoversClass(EncryptionBundle::class)]
 final class EncryptionBundleTest extends TestCase
@@ -377,6 +378,10 @@ final class EncryptionBundleTest extends TestCase
     private function load(array $config): ContainerBuilder
     {
         $builder = new ContainerBuilder();
+        // A real kernel sets both. Building the extension's ContainerConfigurator reads the
+        // environment on 7.4 and 8.0, optional only since 8.1, and the build dir on 7.4 alone.
+        $builder->setParameter('kernel.environment', 'test');
+        $builder->setParameter('kernel.build_dir', sys_get_temp_dir());
         $extension = new EncryptionBundle()->getContainerExtension();
         self::assertNotNull($extension);
         $extension->load([$config], $builder);

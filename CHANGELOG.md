@@ -5,7 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.0] - 2026-08-17
+
+### Added
+
+- Support for Symfony 7.4, the current LTS, alongside Symfony 8. Every Symfony requirement now
+  reads `^7.4 || ^8.0`; no bundle code changed, because everything it uses — `AbstractBundle`,
+  `DefinitionConfigurator::enumFqcn()`, the console attributes — exists in 7.4 already.
+- Symfony 7.4 and 8 as a second dimension of the CI matrix, so both are tested on both supported
+  PHP versions. Flex pins the whole stack to one major per job, rather than letting the transitive
+  components float to whatever the constraints allow.
+
+### Fixed
+
+- `EncryptionBundleTest` loaded the extension against a bare `ContainerBuilder`. Building the
+  extension's `ContainerConfigurator` reads `kernel.environment` off the container on 7.4 and 8.0
+  alike — optional only since 8.1, which is why the suite passed — and `kernel.build_dir` on 7.4
+  besides. The test now sets both, the way a real kernel does. Nothing in `src/` was affected; the
+  omission was the test's.
 
 ## [2.0.0] - 2026-08-03
 
@@ -65,6 +82,6 @@ but code written against the old wording may have been resting on a guarantee th
 
 - Requires the stable upstream `spaze/encryption` `^3.0` instead of a fork.
 
-[Unreleased]: https://github.com/helppc/encryption-bundle/compare/v2.0.0...HEAD
+[2.1.0]: https://github.com/helppc/encryption-bundle/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/helppc/encryption-bundle/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/helppc/encryption-bundle/releases/tag/v1.0.0

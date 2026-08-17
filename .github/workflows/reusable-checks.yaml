@@ -6,6 +6,10 @@ on:
       php_version:
         required: true
         type: string
+      symfony_version:
+        description: 'Symfony version the whole stack is pinned to, as a Flex constraint (for example "7.4.*").'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -27,15 +31,27 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         name: 👞 Checkout
 
-      - uses: php-actions/composer@8a65f0d3c6a1d17ca4800491a40b5756a4c164f3 # v6
-        name: 📀 Install Dependencies
+      - name: 📅 Setup PHP ${{ inputs.php_version }}
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
-          args: ${{ env.composer-install-args }}
-          php_version: ${{ inputs.php_version }}
-          php_extensions: ${{ env.php-extensions }}
+          php-version: ${{ inputs.php_version }}
+          extensions: ${{ env.php-extensions }}
+          tools: composer
 
       - name: 🧪 Composer Validate
         run: composer validate --strict
+
+      # Flex reads SYMFONY_REQUIRE and holds the transitive components to it too, not just the ones
+      # composer.json names, so the job tests one whole stack rather than a mix.
+      - name: 🎼 Install Symfony Flex
+        run: |
+          composer global config --no-plugins allow-plugins.symfony/flex true
+          composer global require --no-progress --no-scripts --no-plugins symfony/flex
+
+      - name: 📀 Install Dependencies (Symfony ${{ inputs.symfony_version }})
+        env:
+          SYMFONY_REQUIRE: ${{ inputs.symfony_version }}
+        run: composer update ${{ env.composer-install-args }}
 
       - name: 🛡️ Composer Audit
         run: composer audit
@@ -56,12 +72,15 @@ jobs:
           extensions: ${{ env.php-extensions }}
           tools: composer
 
-      - uses: php-actions/composer@8a65f0d3c6a1d17ca4800491a40b5756a4c164f3 # v6
-        name: 📀 Install Dependencies
-        with:
-          args: ${{ env.composer-install-args }}
-          php_version: ${{ inputs.php_version }}
-          php_extensions: ${{ env.php-extensions }}
+      - name: 🎼 Install Symfony Flex
+        run: |
+          composer global config --no-plugins allow-plugins.symfony/flex true
+          composer global require --no-progress --no-scripts --no-plugins symfony/flex
+
+      - name: 📀 Install Dependencies (Symfony ${{ inputs.symfony_version }})
+        env:
+          SYMFONY_REQUIRE: ${{ inputs.symfony_version }}
+        run: composer update ${{ env.composer-install-args }}
 
       - name: 🔍 PHPStan Analysis
         id: phpstan
@@ -80,4 +99,3 @@ jobs:
       - name: 🧪 Unit Tests
         if: success() || steps.phpstan.outcome == 'failure' || steps.phpcs.outcome == 'failure' || steps.rector.outcome == 'failure'
         run: composer phpunit
-
