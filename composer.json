@@ -49,7 +49,7 @@
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/phpstan-strict-rules": "^2.0",
     "phpstan/phpstan-symfony": "^2.0",
-    "phpunit/phpunit": "^12.3",
+    "phpunit/phpunit": "^13.4",
     "rector/rector": "^2.1",
     "shipmonk/phpstan-rules": "^4.2",
     "slevomat/coding-standard": "^8.27",
